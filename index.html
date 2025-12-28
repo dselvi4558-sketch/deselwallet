@@ -13,244 +13,297 @@
         :root {
             --gold: #C5A059;
             --gold-glow: rgba(197, 160, 89, 0.4);
-            --bg: #020202;
+            --bg: #010101;
+            --patron-red: #ff4d4d;
         }
 
+        /* Ana Yapı */
         body {
             background-color: var(--bg);
             color: #fff;
             font-family: 'Raleway', sans-serif;
             margin: 0;
             overflow-x: hidden;
+            user-select: none; /* Metin seçimini engeller */
         }
 
         #bg-canvas {
             position: fixed;
             inset: 0;
             z-index: -1;
-            background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
         }
 
-        /* GİRİŞ BUTONU ÖZEL STİL */
+        /* Giriş Butonu - Ultra Glow */
         .btn-auth {
             background: var(--gold);
             color: #000;
             font-weight: 900;
-            padding: 12px 28px;
-            border-radius: 2px;
+            padding: 14px 32px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 15px var(--gold-glow);
-            font-size: 12px;
+            letter-spacing: 0.15em;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 0 20px var(--gold-glow);
+            font-size: 11px;
+            position: relative;
+            overflow: hidden;
         }
         .btn-auth:hover {
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--gold-glow);
             background: #fff;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
         }
 
-        /* ALTIN PARLAMA EFEKTİ */
+        /* Gold Shimmer Animation */
         .gold-shimmer {
             background: linear-gradient(90deg, #8A6E2F, #C5A059, #F2D091, #C5A059, #8A6E2F);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shimmer 8s linear infinite;
+            animation: shimmer 6s linear infinite;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        /* MODAL TASARIMI */
-        .master-modal {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(20px);
+        /* Smooth Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.2s ease-out;
         }
-        .master-modal.active { display: flex; }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
+        /* Luxury Card System */
         .luxury-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(197, 160, 89, 0.1);
-            transition: all 0.6s ease;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(197, 160, 89, 0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
         }
         .luxury-card:hover {
             border-color: var(--gold);
-            transform: translateY(-15px);
-            background: rgba(197, 160, 89, 0.03);
+            transform: scale(1.03);
+            background: rgba(197, 160, 89, 0.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
 
-        /* PATRON PANELİ */
+        /* Patron Panel Style */
         #patron-panel {
             display: none;
-            position: fixed; inset: 10%;
-            background: #050505;
-            border: 1px solid #ff4d4d;
-            z-index: 10000;
-            padding: 50px;
-            box-shadow: 0 0 100px rgba(255, 0, 0, 0.15);
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10001;
+            padding: 5%;
+            border: 4px solid var(--patron-red);
+            animation: panelFade 0.5s ease;
         }
+        @keyframes panelFade { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+
+        /* Modal Structure */
+        .master-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(40px);
+        }
+        .master-modal.active { display: flex; }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <nav class="fixed w-full h-24 flex items-center z-[1000] border-b border-white/5 bg-black/80 backdrop-blur-md">
+    <nav class="fixed w-full h-28 flex items-center z-[1000] border-b border-white/5 bg-black/80 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-10 w-full flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <img src="LOGOM2.jpg" class="w-12 h-12 border border-brand-gold/20" onerror="this.src='https://via.placeholder.com/50'">
-                <h1 class="text-2xl font-serif gold-shimmer tracking-[0.3em] font-bold uppercase">DeselWallet</h1>
+            <div class="flex items-center gap-6">
+                <img src="LOGOM2.jpg" class="w-14 h-14 border border-brand-gold/20 shadow-2xl" onerror="this.src='https://via.placeholder.com/60/000/C5A059?text=DW'">
+                <div class="flex flex-col">
+                    <h1 class="text-2xl font-serif gold-shimmer tracking-[0.4em] font-black uppercase">DeselWallet</h1>
+                    <span class="text-[8px] text-gray-500 tracking-[0.8em] uppercase">Authentic Leather Intelligence</span>
+                </div>
             </div>
             
-            <div class="flex items-center gap-6">
-                <button onclick="openModal('auth-modal')" class="btn-auth">
-                    GİRİŞ / KAYIT
-                </button>
-                
-                <button onclick="openModal('admin-modal')" class="border border-red-600/30 text-red-500 px-5 py-2 uppercase text-[9px] tracking-widest hover:bg-red-600 hover:text-white transition-all">
-                    ADMİN
-                </button>
+            <div class="flex items-center gap-8">
+                <button onclick="openModal('auth-modal')" class="btn-auth">GİRİŞ / KAYIT</button>
+                <button onclick="openModal('admin-modal')" class="text-red-600 border border-red-900/30 px-6 py-2 uppercase text-[9px] tracking-widest hover:bg-red-600 hover:text-white transition-all font-bold">ADMİN</button>
             </div>
         </div>
     </nav>
 
-    <main class="relative pt-64 pb-40 text-center">
-        <div class="container mx-auto px-6">
-            <h3 class="text-brand-gold text-[10px] tracking-[2em] uppercase mb-8 opacity-60">Elite Digital Asset Management</h3>
-            <h1 class="text-[12vw] font-serif gold-shimmer uppercase italic leading-none mb-20">DeselWallet</h1>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-                <div class="luxury-card p-10 group">
-                    <div class="h-80 overflow-hidden mb-8">
-                        <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+    <main class="relative pt-72 pb-20 text-center">
+        <section class="reveal">
+            <h3 class="text-brand-gold text-[10px] tracking-[2.5em] uppercase mb-12 opacity-50">Precision Crafted Engineering</h3>
+            <h1 class="text-[14vw] font-serif gold-shimmer uppercase italic leading-none mb-10 select-none">DeselWallet</h1>
+            <div class="w-32 h-[1px] bg-gradient-to-r from-transparent via-brand-gold to-transparent mx-auto mb-32"></div>
+        </section>
+
+        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div class="luxury-card p-4 reveal">
+                <div class="overflow-hidden relative group">
+                    <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800" class="w-full h-[450px] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="border border-white px-6 py-2 text-[10px] uppercase tracking-widest">İncele</span>
                     </div>
-                    <h4 class="text-xl font-serif gold-shimmer tracking-widest uppercase">Connect V1</h4>
                 </div>
-                <div class="luxury-card p-10 group">
-                    <div class="h-80 overflow-hidden mb-8">
-                        <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
-                    </div>
-                    <h4 class="text-xl font-serif gold-shimmer tracking-widest uppercase">SafePass Core</h4>
-                </div>
-                <div class="luxury-card p-10 group">
-                    <div class="h-80 overflow-hidden mb-8">
-                        <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
-                    </div>
-                    <h4 class="text-xl font-serif gold-shimmer tracking-widest uppercase">Finder Slim</h4>
-                </div>
+                <h4 class="mt-8 text-xl font-serif gold-shimmer tracking-widest uppercase">Connect V1</h4>
             </div>
 
-            <div class="flex flex-col md:flex-row justify-center gap-20 mt-40">
-                <button onclick="openModal('contact-modal')" class="text-white border-b-2 border-white pb-2 font-bold uppercase tracking-[0.5em] hover:text-brand-gold hover:border-brand-gold transition-all">İletişim</button>
-                <button onclick="openModal('suggestion-modal')" class="text-white border-b-2 border-white pb-2 font-bold uppercase tracking-[0.5em] hover:text-brand-gold hover:border-brand-gold transition-all">Önerileriniz</button>
+            <div class="luxury-card p-4 reveal" style="transition-delay: 0.2s;">
+                <div class="overflow-hidden relative group">
+                    <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800" class="w-full h-[450px] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="border border-white px-6 py-2 text-[10px] uppercase tracking-widest">İncele</span>
+                    </div>
+                </div>
+                <h4 class="mt-8 text-xl font-serif gold-shimmer tracking-widest uppercase">SafePass Core</h4>
+            </div>
+
+            <div class="luxury-card p-4 reveal" style="transition-delay: 0.4s;">
+                <div class="overflow-hidden relative group">
+                    <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800" class="w-full h-[450px] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="border border-white px-6 py-2 text-[10px] uppercase tracking-widest">İncele</span>
+                    </div>
+                </div>
+                <h4 class="mt-8 text-xl font-serif gold-shimmer tracking-widest uppercase">Finder Slim</h4>
+            </div>
+        </div>
+
+        <div class="mt-60 flex flex-col items-center reveal">
+            <div class="flex gap-24 mb-20">
+                <button onclick="openModal('contact-modal')" class="text-white border-b border-white/20 pb-4 font-black uppercase tracking-[0.8em] text-xs hover:text-brand-gold hover:border-brand-gold transition-all">İletişim</button>
+                <button onclick="openModal('suggestion-modal')" class="text-white border-b border-white/20 pb-4 font-black uppercase tracking-[0.8em] text-xs hover:text-brand-gold hover:border-brand-gold transition-all">Önerileriniz</button>
             </div>
         </div>
     </main>
 
+    <div id="patron-panel">
+        <div class="flex justify-between items-center border-b border-red-600/30 pb-10">
+            <h2 class="text-4xl font-serif text-red-600 tracking-[0.5em] font-black uppercase">Patron Command Center</h2>
+            <button onclick="closePatron()" class="bg-red-600 text-black px-12 py-3 font-bold uppercase hover:bg-white transition-all">Güvenli Çıkış</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mt-20">
+            <div class="bg-red-600/5 border border-red-600/20 p-10">
+                <p class="text-[10px] text-red-500 uppercase tracking-widest mb-4">Sunucu Durumu</p>
+                <p class="text-3xl font-black">STABLE 100%</p>
+            </div>
+            <div class="bg-red-600/5 border border-red-600/20 p-10">
+                <p class="text-[10px] text-red-500 uppercase tracking-widest mb-4">Gelen Veriler</p>
+                <p class="text-3xl font-black italic">SİSTEM TEMİZ</p>
+            </div>
+            <div class="bg-red-600/5 border border-red-600/20 p-10">
+                <p class="text-[10px] text-red-500 uppercase tracking-widest mb-4">Aktif Şifreleme</p>
+                <p class="text-3xl font-black">AES-256 BIT</p>
+            </div>
+        </div>
+    </div>
+
     <div id="auth-modal" class="master-modal">
-        <div class="bg-[#080808] border border-white/10 p-12 max-w-sm w-full text-center relative">
-            <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fa-solid fa-times"></i></button>
-            <h2 class="text-brand-gold font-serif text-2xl tracking-widest mb-10 uppercase">HESAP ERİŞİMİ</h2>
-            <input type="email" placeholder="E-Posta" class="w-full bg-black border border-white/5 p-4 mb-4 outline-none focus:border-brand-gold">
-            <input type="password" placeholder="Şifre" class="w-full bg-black border border-white/5 p-4 mb-8 outline-none focus:border-brand-gold">
-            <button class="w-full bg-brand-gold text-black font-bold py-4 uppercase tracking-widest text-xs">Giriş Yap</button>
+        <div class="bg-black border border-white/10 p-16 max-w-md w-full relative">
+            <button onclick="closeModal('auth-modal')" class="absolute top-6 right-6 text-gray-700 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 class="text-brand-gold font-serif text-3xl tracking-widest mb-10 text-center">ACCESS</h2>
+            <input type="email" placeholder="E-Posta" class="w-full bg-[#080808] border border-white/5 p-5 mb-4 focus:border-brand-gold outline-none">
+            <input type="password" placeholder="Şifre" class="w-full bg-[#080808] border border-white/5 p-5 mb-8 focus:border-brand-gold outline-none">
+            <button class="w-full bg-brand-gold text-black font-black py-5 uppercase tracking-widest hover:bg-white transition-all">Giriş Yap</button>
         </div>
     </div>
 
     <div id="admin-modal" class="master-modal">
-        <div class="bg-[#080808] border border-red-600/20 p-12 max-w-sm w-full text-center relative">
-            <button onclick="closeModal('admin-modal')" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fa-solid fa-times"></i></button>
-            <h2 class="text-red-600 font-serif text-xl tracking-widest mb-8 uppercase">MASTER LOGIN</h2>
-            <input type="password" id="admin-pass-field" placeholder="••••••••" class="w-full bg-black border border-white/10 p-4 mb-4 text-center text-xl outline-none focus:border-red-600">
-            <button onclick="unlockPatron()" class="w-full bg-red-600 text-black font-bold py-3 uppercase tracking-widest text-xs">Aç</button>
-        </div>
-    </div>
-
-    <div id="patron-panel">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="text-3xl font-serif text-red-600 uppercase tracking-widest">PATRON CONTROL</h2>
-            <button onclick="closePatron()" class="bg-red-600 text-black px-6 py-2 font-bold uppercase text-[10px]">Kapat</button>
-        </div>
-        <div class="grid grid-cols-2 gap-10">
-            <div class="p-6 border border-white/5 bg-white/5">
-                <p class="text-gray-500 text-[10px] uppercase mb-2">Sunucu Yükü</p>
-                <div class="text-2xl font-bold">0.02ms / 100% OK</div>
-            </div>
-            <div class="p-6 border border-white/5 bg-white/5">
-                <p class="text-gray-500 text-[10px] uppercase mb-2">Kayıtlı Cüzdanlar</p>
-                <div class="text-2xl font-bold">0 Active</div>
-            </div>
+        <div class="bg-[#050505] border border-red-600/30 p-16 max-w-md w-full text-center relative">
+            <button onclick="closeModal('admin-modal')" class="absolute top-6 right-6 text-gray-700 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 class="text-red-600 font-serif text-xl tracking-[0.5em] mb-12 uppercase">Master Key</h2>
+            <input type="password" id="master-key-input" placeholder="••••••••" class="w-full bg-black border border-red-600/20 p-5 mb-8 text-center text-2xl text-red-600 outline-none focus:border-red-600">
+            <button onclick="validateMaster()" class="w-full bg-red-600 text-black font-black py-5 uppercase tracking-widest">Verify Identity</button>
         </div>
     </div>
 
     <script>
+        // C++ Particle Engine (Developed)
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let dots = [];
-        const dotCount = 80;
+        let particles = [];
 
         function init() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            dots = [];
-            for(let i=0; i<dotCount; i++) {
-                dots.push({
+            particles = [];
+            for(let i=0; i<100; i++) {
+                particles.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    size: Math.random() * 2
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    r: Math.random() * 1.5
                 });
             }
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
             ctx.fillStyle = "rgba(197, 160, 89, 0.4)";
-            
-            dots.forEach((dot, i) => {
-                dot.x += dot.vx;
-                dot.y += dot.vy;
-                if(dot.x < 0 || dot.x > canvas.width) dot.vx *= -1;
-                if(dot.y < 0 || dot.y > canvas.height) dot.vy *= -1;
-                
-                ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI*2);
-                ctx.fill();
-
-                for(let j=i+1; j<dots.length; j++) {
-                    const d2 = dots[j];
-                    const dist = Math.sqrt((dot.x - d2.x)**2 + (dot.y - d2.y)**2);
-                    if(dist < 180) {
-                        ctx.strokeStyle = `rgba(197, 160, 89, ${1 - dist/180})`;
-                        ctx.lineWidth = 0.3;
-                        ctx.beginPath();
-                        ctx.moveTo(dot.x, dot.y);
-                        ctx.lineTo(d2.x, d2.y);
-                        ctx.stroke();
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx *= -1;
+                if(p.y<0 || p.y>canvas.height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+                for(let j=i+1; j<particles.length; j++) {
+                    let d = Math.sqrt((p.x-particles[j].x)**2 + (p.y-particles[j].y)**2);
+                    if(d < 180) {
+                        ctx.strokeStyle = `rgba(197, 160, 89, ${1 - d/180})`;
+                        ctx.lineWidth = 0.2;
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
                     }
                 }
             });
-            requestAnimationFrame(draw);
+            requestAnimationFrame(animate);
         }
 
-        const ADMIN_PASS = "DeselAdmin2025!";
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function unlockPatron() {
-            if(document.getElementById('admin-pass-field').value === ADMIN_PASS) {
+        // Reveal Animation Logic
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if(el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
+            });
+        });
+
+        // Web Seviyesi Koruma (Anti-Inspect)
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
+                return false;
+            }
+        };
+
+        // Modal Controls
+        const openModal = id => document.getElementById(id).classList.add('active');
+        const closeModal = id => document.getElementById(id).classList.remove('active');
+
+        // Admin Logic
+        const MASTER_PASS = "DeselAdmin2025!"; 
+        function validateMaster() {
+            if(document.getElementById('master-key-input').value === MASTER_PASS) {
                 closeModal('admin-modal');
                 document.getElementById('patron-panel').style.display = 'block';
-            } else { alert("Hata!"); }
+                document.body.style.overflow = 'hidden';
+            } else { alert("ACCESS DENIED"); }
         }
-        function closePatron() { document.getElementById('patron-panel').style.display = 'none'; }
+        function closePatron() {
+            document.getElementById('patron-panel').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
 
+        window.onload = () => { init(); animate(); document.querySelector('.reveal').classList.add('active'); };
         window.onresize = init;
-        init(); draw();
     </script>
+
+    <footer class="py-10 border-t border-white/5 text-center bg-black">
+        <p class="text-[7px] tracking-[1.5em] text-gray-700 uppercase">© 2025 DESELWALLET HUB | ENGINEERED FOR THE ELITE</p>
+    </footer>
 
 </body>
 </html>
