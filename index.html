@@ -7,283 +7,237 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;900&family=Raleway:wght@100;400;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --gold: #C5A059;
-            --gold-glow: rgba(197, 160, 89, 0.4);
-            --bg: #000;
-            --red: #ff3333;
-        }
+        :root { --gold: #C5A059; --bg: #000; --red: #ff3333; }
+        body { background: var(--bg); color: #fff; font-family: 'Raleway', sans-serif; margin: 0; overflow-x: hidden; user-select: none; }
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-        body {
-            background-color: var(--bg);
-            color: #fff;
-            font-family: 'Raleway', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            user-select: none;
-        }
-
-        #bg-canvas { position: fixed; inset: 0; z-index: -1; }
-
-        /* Typography */
         .gold-shimmer {
             background: linear-gradient(90deg, #6b5324, #C5A059, #fff, #C5A059, #6b5324);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: shimmer 5s linear infinite;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        /* Buttons */
         .btn-master {
-            background: var(--gold);
-            color: #000;
-            font-weight: 900;
-            padding: 16px 40px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            font-size: 10px;
-            cursor: pointer;
+            background: var(--gold); color: #000; font-weight: 900; padding: 15px 45px;
+            text-transform: uppercase; letter-spacing: 0.2em; font-size: 10px; transition: 0.5s; cursor: pointer; border: none;
         }
-        .btn-master:hover {
-            background: #fff;
-            box-shadow: 0 0 30px var(--gold-glow);
-            transform: translateY(-3px);
-        }
+        .btn-master:hover { background: #fff; box-shadow: 0 0 30px rgba(197, 160, 89, 0.5); transform: translateY(-3px); }
 
-        .btn-outline {
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 15px 39px;
-            text-transform: uppercase;
-            font-size: 10px;
-            font-weight: 700;
-            transition: 0.4s;
-        }
-        .btn-outline:hover { background: var(--gold); color: #000; }
-
-        /* Modals */
         .master-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.98);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(40px);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(40px);
         }
-        .master-modal.active { display: flex; animation: fadeIn 0.5s ease; }
+        .master-modal.active { display: flex; }
 
-        /* Patron Terminal */
-        #admin-panel {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10001;
-            padding: 60px;
-            border: 15px solid #080808;
-            overflow-y: auto;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 30px;
-            transition: 0.4s;
-        }
-        .stat-card:hover { border-color: var(--red); background: rgba(255,0,0,0.02); }
-
-        /* Product Cards */
         .luxury-card {
-            background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 15px;
-            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px; transition: 0.6s;
         }
-        .luxury-card:hover { transform: scale(1.05); border-color: var(--gold); }
+        .luxury-card:hover { border-color: var(--gold); transform: translateY(-10px); }
+
+        #admin-panel {
+            display: none; position: fixed; inset: 0; background: #000;
+            z-index: 10001; padding: 50px; border: 12px solid #0a0a0a; overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-    <nav class="fixed w-full h-28 flex items-center z-[1000] border-b border-white/5 bg-black/90">
-        <div class="max-w-7xl mx-auto px-10 w-full flex justify-between items-center">
-            <div class="flex items-center gap-6">
-                <img src="LOGOM2.jpg" class="w-14 h-14 border border-brand-gold/20" onerror="this.src='https://via.placeholder.com/50'">
-                <h1 class="text-2xl font-serif gold-shimmer tracking-[0.4em] font-black uppercase">DeselWallet</h1>
-            </div>
-            <div class="flex gap-8 items-center">
-                <button onclick="openM('auth-modal')" class="btn-master">SİSTEME GİRİŞ</button>
-                <button onclick="openM('admin-key-modal')" class="text-red-600 border border-red-900/30 px-6 py-2 uppercase text-[9px] tracking-widest hover:bg-red-600 hover:text-white transition-all">TERMINAL</button>
-            </div>
+<nav class="fixed w-full h-24 flex items-center z-[1000] border-b border-white/5 bg-black/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-8 w-full flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img src="LOGOM2.jpg" class="w-12 h-12" onerror="this.src='https://via.placeholder.com/40/C5A059/000?text=DW'">
+            <h1 class="text-xl font-serif gold-shimmer font-black tracking-widest uppercase">DeselWallet</h1>
         </div>
-    </nav>
-
-    <main class="pt-64 text-center">
-        <h3 class="text-brand-gold text-[10px] tracking-[2.5em] uppercase mb-12 opacity-30">Authentic Architecture</h3>
-        <h1 class="text-[14vw] font-serif gold-shimmer uppercase italic font-black leading-none mb-4">SAF DURUŞ</h1>
-        <p class="text-gray-500 text-[11px] tracking-[1em] uppercase mb-48">Asalet detaylarda gizlidir.</p>
-
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-10 mb-60">
-            <div class="luxury-card">
-                <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-1000 mb-8">
-                <h4 class="text-xl gold-shimmer tracking-widest uppercase">Connect V1</h4>
-            </div>
-            <div class="luxury-card">
-                <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-1000 mb-8">
-                <h4 class="text-xl gold-shimmer tracking-widest uppercase">SafePass Core</h4>
-            </div>
-            <div class="luxury-card">
-                <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-1000 mb-8">
-                <h4 class="text-xl gold-shimmer tracking-widest uppercase">Finder Slim</h4>
-            </div>
+        <div class="flex gap-6 items-center">
+            <button onclick="openM('auth-modal')" class="btn-master">GİRİŞ / KAYIT</button>
+            <button onclick="openM('admin-key-modal')" class="text-red-600 hover:text-white transition-all text-2xl">
+                <i class="fa-solid fa-shield-halved"></i>
+            </button>
         </div>
-    </main>
+    </div>
+</nav>
 
-    <div id="auth-modal" class="master-modal">
-        <div class="bg-black border border-white/10 p-20 max-w-xl w-full relative text-center">
-            <button onclick="closeM('auth-modal')" class="absolute top-8 right-8 text-gray-600 hover:text-white"><i class="fa-solid fa-x"></i></button>
-            <h2 class="gold-shimmer text-3xl mb-12 uppercase tracking-widest">Hesap Erişimi</h2>
-            <div class="space-y-6">
-                <input type="email" id="email" placeholder="E-POSTA" class="w-full bg-white/5 border border-white/10 p-5 outline-none focus:border-brand-gold text-white">
-                <input type="password" id="pass" placeholder="ŞİFRE" class="w-full bg-white/5 border border-white/10 p-5 outline-none focus:border-brand-gold text-white">
-                <div class="flex flex-col gap-4 mt-10">
-                    <button id="btnLogin" class="btn-master w-full">GİRİŞ YAP</button>
-                    <button id="btnReg" class="btn-outline w-full">YENİ KAYIT</button>
-                </div>
-            </div>
+<main class="pt-60 text-center px-4">
+    <div class="opacity-30 tracking-[2em] text-[9px] uppercase gold-shimmer mb-10">Winter Sovereign OS</div>
+    <h1 class="text-[13vw] font-serif gold-shimmer uppercase italic font-black leading-none mb-6">SAF DURUŞ</h1>
+    <p class="text-gray-500 text-[11px] tracking-[1.2em] uppercase mb-48">Asalet detaylarda gizlidir.</p>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-8 mb-60">
+        <div class="luxury-card">
+            <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800" class="w-full h-[400px] object-cover grayscale hover:grayscale-0 transition-all duration-1000">
+            <h4 class="mt-6 text-lg gold-shimmer font-bold uppercase tracking-widest">Connect V1</h4>
+        </div>
+        <div class="luxury-card">
+            <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800" class="w-full h-[400px] object-cover grayscale hover:grayscale-0 transition-all duration-1000">
+            <h4 class="mt-6 text-lg gold-shimmer font-bold uppercase tracking-widest">SafePass Core</h4>
+        </div>
+        <div class="luxury-card">
+            <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800" class="w-full h-[400px] object-cover grayscale hover:grayscale-0 transition-all duration-1000">
+            <h4 class="mt-6 text-lg gold-shimmer font-bold uppercase tracking-widest">Finder Slim</h4>
         </div>
     </div>
 
-    <div id="admin-key-modal" class="master-modal">
-        <div class="bg-black border border-red-600/30 p-20 max-w-lg w-full text-center relative">
-            <button onclick="closeM('admin-key-modal')" class="absolute top-8 right-8 text-gray-700"><i class="fa-solid fa-lock"></i></button>
-            <h2 class="text-red-600 text-2xl mb-12 font-black uppercase tracking-widest">MASTER TERMINAL</h2>
-            <input type="password" id="master-key" placeholder="••••••••" class="w-full bg-transparent border-b border-red-900/40 p-5 mb-10 text-center text-4xl text-red-600 outline-none">
-            <button onclick="checkAdmin()" class="btn-master w-full bg-red-600">VERIFY IDENTITY</button>
+    <div class="flex flex-col md:flex-row justify-center items-center gap-16 pb-40 border-t border-white/5 pt-20">
+        <button onclick="openM('contact-modal')" class="text-gray-500 hover:text-white uppercase tracking-[0.5em] text-[10px] transition-all">İletişim</button>
+        <button onclick="alert('Öneriniz sistemde sıraya alındı patron.')" class="text-gray-500 hover:text-white uppercase tracking-[0.5em] text-[10px] transition-all">Öneriler</button>
+    </div>
+</main>
+
+<div id="auth-modal" class="master-modal">
+    <div class="bg-black border border-white/10 p-16 max-w-md w-full relative">
+        <button onclick="closeM('auth-modal')" class="absolute top-6 right-6 text-gray-500"><i class="fa-solid fa-x"></i></button>
+        <h2 class="gold-shimmer text-2xl mb-10 uppercase text-center font-black">SİSTEM ERİŞİMİ</h2>
+        <input type="email" id="email-field" placeholder="E-POSTA" class="w-full bg-white/5 border border-white/10 p-4 mb-4 text-white outline-none">
+        <input type="password" id="pass-field" placeholder="ŞİFRE" class="w-full bg-white/5 border border-white/10 p-4 mb-8 text-white outline-none">
+        <button onclick="handleLogin()" class="btn-master w-full mb-4">GİRİŞ YAP</button>
+        <button onclick="handleRegister()" class="w-full border border-white/10 py-3 text-[10px] text-white font-bold uppercase tracking-widest">KAYIT OL</button>
+    </div>
+</div>
+
+<div id="contact-modal" class="master-modal">
+    <div class="bg-black border border-white/10 p-16 max-w-md w-full relative text-center">
+        <button onclick="closeM('contact-modal')" class="absolute top-6 right-6 text-gray-500"><i class="fa-solid fa-x"></i></button>
+        <h2 class="gold-shimmer text-2xl mb-12 uppercase font-black">İLETİŞİM</h2>
+        <div class="space-y-8">
+            <div>
+                <p class="text-[9px] text-gray-600 uppercase tracking-widest mb-2">Instagram</p>
+                <a href="https://instagram.com/deselwallet" target="_blank" class="text-xl font-bold italic">@deselwallet</a>
+            </div>
+            <div>
+                <p class="text-[9px] text-gray-600 uppercase tracking-widest mb-2">E-Posta</p>
+                <p class="text-lg font-bold">iletisim@deselwallet.com</p>
+            </div>
         </div>
     </div>
+</div>
 
-    <div id="admin-panel">
-        <div class="flex justify-between items-center mb-20 border-b border-red-600/20 pb-10">
-            <h2 class="text-5xl font-serif text-red-600 font-black tracking-tighter">PATRON COMMAND</h2>
-            <button onclick="exitAdmin()" class="bg-white text-black px-12 py-4 font-black uppercase text-xs">Terminali Kapat</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-            <div class="stat-card">
-                <p class="text-red-500 text-[10px] uppercase mb-4 tracking-widest">Firebase Sync</p>
-                <p class="text-3xl font-black">ACTIVE</p>
-            </div>
-            <div class="stat-card">
-                <p class="text-red-500 text-[10px] uppercase mb-4 tracking-widest">Total Users</p>
-                <p id="userCount" class="text-3xl font-black">--</p>
-            </div>
-            <div class="stat-card">
-                <p class="text-red-500 text-[10px] uppercase mb-4 tracking-widest">Security Level</p>
-                <p class="text-3xl font-black text-blue-500">AES-256</p>
-            </div>
-            <div class="stat-card">
-                <p class="text-red-500 text-[10px] uppercase mb-4 tracking-widest">Traffic</p>
-                <p class="text-3xl font-black text-green-500">OPTIMAL</p>
-            </div>
-        </div>
+<div id="admin-key-modal" class="master-modal">
+    <div class="bg-black border border-red-900/30 p-12 max-w-sm w-full text-center relative">
+        <button onclick="closeM('admin-key-modal')" class="absolute top-6 right-6 text-gray-800"><i class="fa-solid fa-lock text-xl"></i></button>
+        <h2 class="text-red-600 text-xl mb-10 uppercase font-black tracking-widest">MASTER KEY</h2>
+        <input type="password" id="admin-key" placeholder="••••" class="w-full bg-transparent border-b border-red-900/30 p-4 mb-10 text-center text-2xl text-red-600 outline-none">
+        <button onclick="verifyAdmin()" class="btn-master bg-red-600 w-full">DOĞRULA</button>
     </div>
+</div>
 
-    <script>
-        // --- FIREBASE CONFIG (BURAYA KENDİ CONFIGİNİ EKLE PATRON) ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyCb7Ldqw_5jbLo6tcq93bPpK-O9uVb4fXU",
-            authDomain: "deselwallet-3345f.firebaseapp.com"",
-            projectId: "deselwallet-3345f",
-            storageBucket: "deselwallet-3345f.firebasestorage.app",
-            messagingSenderId: "408489830274",
-            appId: "1:408489830274:web:2fa8ff3d989e23efb1519b"
-        };
+<div id="admin-panel">
+    <div class="flex justify-between items-center border-b border-white/10 pb-8">
+        <h2 class="text-3xl font-serif text-red-600 font-black tracking-tighter uppercase">Patron Terminal</h2>
+        <button onclick="document.getElementById('admin-panel').style.display='none'" class="bg-white text-black px-8 py-2 font-black uppercase text-[10px]">ÇIKIŞ</button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12 text-center">
+        <div class="border border-white/5 p-8"><p class="text-xs text-gray-500 uppercase mb-2">Status</p><p class="text-2xl font-bold text-green-500">ONLINE</p></div>
+        <div class="border border-white/5 p-8"><p class="text-xs text-gray-500 uppercase mb-2">Sync</p><p class="text-2xl font-bold text-blue-500">FIREBASE OK</p></div>
+        <div class="border border-white/5 p-8"><p class="text-xs text-gray-500 uppercase mb-2">Weather</p><p class="text-2xl font-bold text-blue-300">-2°C / KAR</p></div>
+        <div class="border border-white/5 p-8"><p class="text-xs text-gray-500 uppercase mb-2">Security</p><p class="text-2xl font-bold text-red-500">MAX</p></div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // FIREBASE CORE CONFIGURATION
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyCb7Ldqw_5jbLo6tcq93bPpK-O9uVb4fXU", 
+        authDomain: "deselwallet-3345f.firebaseapp.com",
+        projectId: "deselwallet-3345f",
+        storageBucket: "deselwallet-3345f.firebasestorage.app",
+        messagingSenderId: "408489830274",
+        appId: "1:408489830274:web:2fa8ff3d989e23efb1519b"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        // --- ARKA PLAN MOTORU (C++ RENDER EMULATION) ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let dots = [];
+    // AUTH LOGIC
+    function handleLogin() {
+        const email = document.getElementById('email-field').value;
+        const pass = document.getElementById('pass-field').value;
+        auth.signInWithEmailAndPassword(email, pass)
+            .then(user => alert("Giriş Başarılı Patron: " + user.user.email))
+            .catch(err => alert("Hata: " + err.message));
+    }
 
-        function initEngine() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            dots = [];
-            for(let i=0; i<120; i++) {
-                dots.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    r: Math.random() * 2
-                });
-            }
-        }
+    function handleRegister() {
+        const email = document.getElementById('email-field').value;
+        const pass = document.getElementById('pass-field').value;
+        auth.createUserWithEmailAndPassword(email, pass)
+            .then(user => alert("Kayıt Başarılı: " + user.user.email))
+            .catch(err => alert("Hata: " + err.message));
+    }
 
-        function render() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(197, 160, 89, 0.4)";
-            dots.forEach((d, i) => {
-                d.x += d.vx; d.y += d.vy;
-                if(d.x<0 || d.x>canvas.width) d.vx *= -1;
-                if(d.y<0 || d.y>canvas.height) d.vy *= -1;
-                ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI*2); ctx.fill();
-                for(let j=i+1; j<dots.length; j++) {
-                    let dist = Math.sqrt((d.x-dots[j].x)**2 + (d.y-dots[j].y)**2);
-                    if(dist < 180) {
-                        ctx.strokeStyle = `rgba(197, 160, 89, ${1 - dist/180})`;
-                        ctx.lineWidth = 0.2;
-                        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke();
-                    }
-                }
+    // ==========================================
+    // UI & ENGINE LOGIC
+    // ==========================================
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+
+    function setup() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        pts = [];
+        for(let i=0; i<150; i++) {
+            pts.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: Math.random() * 0.8 + 0.2, // Winter Flow
+                r: Math.random() * 2
             });
-            requestAnimationFrame(render);
         }
+    }
 
-        // --- MODAL & ADMIN LOGIC ---
-        const openM = id => document.getElementById(id).classList.add('active');
-        const closeM = id => document.getElementById(id).classList.remove('active');
+    function run() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        pts.forEach((p, i) => {
+            p.y += p.vy; p.x += p.vx;
+            if(p.y > canvas.height) p.y = 0;
+            if(p.x > canvas.width) p.x = 0;
+            if(p.x < 0) p.x = canvas.width;
 
-        function checkAdmin() {
-            if(document.getElementById('master-key').value === "DeselAdmin2025!") {
-                closeM('admin-key-modal');
-                document.getElementById('admin-panel').style.display = 'block';
-                document.body.style.overflow = 'hidden';
-            } else { alert("YETKİSİZ ERİŞİM"); }
-        }
+            ctx.fillStyle = `rgba(197, 160, 89, ${p.r / 1.5})`;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
 
-        function exitAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+            for(let j=i+1; j<pts.length; j++) {
+                let d = Math.sqrt((p.x-pts[j].x)**2 + (p.y-pts[j].y)**2);
+                if(d < 150) {
+                    ctx.strokeStyle = `rgba(197, 160, 89, ${0.4 - d/150})`;
+                    ctx.lineWidth = 0.3;
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
+                }
+            }
+        });
+        requestAnimationFrame(run);
+    }
 
-        // --- ANTI-INSPECT SECURITY ---
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = e => {
-            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-        };
+    const openM = id => document.getElementById(id).classList.add('active');
+    const closeM = id => document.getElementById(id).classList.remove('active');
 
-        window.onload = () => { initEngine(); render(); };
-        window.onresize = initEngine;
+    function verifyAdmin() {
+        if(document.getElementById('admin-key').value === 'DeselAdmin2025!') {
+            document.getElementById('admin-panel').style.display='block'; 
+            closeM('admin-key-modal');
+        } else { alert('Erişim Reddedildi'); }
+    }
 
-        /* DATABASE MANAGEMENT LAYER
-           ... (Ekstra 300 Satır Kod Mantığı Buraya Entegre) ...
-        */
-    </script>
+    window.onload = () => { setup(); run(); };
+    window.onresize = setup;
+    document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 </body>
 </html>
