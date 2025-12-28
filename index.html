@@ -3,27 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeselWallet | Elite Interface</title>
+    <title>DeselWallet | Master Interface</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Raleway:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* CORE GRAPHICS ENGINE (CSS PART)
-           Defining the luxury aesthetics for DeselWallet
-        */
         :root {
-            --brand-gold: #C5A059;
-            --brand-gold-dark: #8A6E2F;
-            --brand-gold-light: #F2D091;
-            --deep-black: #030303;
-            --card-bg: rgba(10, 10, 10, 0.9);
-            --transition-speed: 0.8s;
+            --gold: #C5A059;
+            --bg: #030303;
+            --glass: rgba(10, 10, 10, 0.95);
         }
 
         body {
-            background-color: var(--deep-black);
+            background-color: var(--bg);
             color: #d1d1d1;
             font-family: 'Raleway', sans-serif;
             margin: 0;
@@ -31,115 +25,37 @@
             scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar for Elite Feeling */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--brand-gold); border-radius: 10px; }
+        #bg-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.5; }
 
-        /* Gold Shimmer Effect for Text */
         .gold-shimmer {
             background: linear-gradient(90deg, #8A6E2F, #C5A059, #F2D091, #C5A059, #8A6E2F);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shimmer 12s linear infinite;
+            animation: shimmer 10s linear infinite;
         }
         @keyframes shimmer { to { background-position: 200% center; } }
 
-        /* C++ Background Engine (Canvas) Styling */
-        #cpp-engine-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.4;
-        }
-
-        /* NAV BAR STYLING
-        */
-        .navbar-master {
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(197, 160, 89, 0.1);
-            height: 100px;
-            display: flex;
-            align-items: center;
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .nav-logo {
-            font-family: 'Cinzel', serif;
-            font-weight: 900;
-            letter-spacing: 0.5em;
-            color: var(--brand-gold);
-            text-transform: uppercase;
-        }
-
-        /* HERO & CONTENT STYLING
-        */
-        .hero-title {
-            font-size: clamp(3rem, 12vw, 15rem);
-            font-family: 'Cinzel', serif;
-            letter-spacing: -0.05em;
-            text-transform: uppercase;
-            font-style: italic;
-            line-height: 0.8;
-        }
-
-        /* THE TWO WHITE BUTTONS (PATRON'S CHOICE)
-        */
+        /* BUTTONS */
         .master-btn-white {
             color: #ffffff;
             border-bottom: 3px solid #ffffff;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 0.7em;
+            letter-spacing: 0.6em;
             padding: 15px 40px;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
+            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+            background: transparent;
         }
         .master-btn-white:hover {
-            color: var(--brand-gold);
-            border-color: var(--brand-gold);
-            letter-spacing: 0.9em;
+            color: var(--gold);
+            border-color: var(--gold);
+            letter-spacing: 0.8em;
             transform: translateY(-5px);
         }
 
-        /* PRODUCT CARD SYSTEM
-        */
-        .luxury-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(197, 160, 89, 0.05);
-            padding: 40px;
-            transition: all var(--transition-speed) cubic-bezier(0.19, 1, 0.22, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .luxury-card:hover {
-            border-color: var(--brand-gold);
-            transform: scale(1.02) translateY(-10px);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-        }
-        .luxury-card img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            filter: grayscale(100%);
-            transition: 1.2s;
-        }
-        .luxury-card:hover img {
-            filter: grayscale(0%);
-            transform: scale(1.1);
-        }
-
-        /* MODAL ENGINE 2.0 
-        */
+        /* MODAL SYSTEM */
         .master-modal {
             display: none;
             position: fixed;
@@ -148,305 +64,163 @@
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            animation: modalFadeIn 0.5s ease;
+            backdrop-filter: blur(30px);
         }
-        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
         .master-modal.active { display: flex; }
 
-        .modal-content {
+        .modal-box {
             background: #080808;
             border: 1px solid rgba(197, 160, 89, 0.2);
-            width: 100%;
-            max-width: 700px;
-            padding: 60px;
+            width: 90%;
+            max-width: 500px;
+            padding: 50px;
             position: relative;
-            text-align: center;
         }
 
         .elite-input {
             width: 100%;
             background: #000;
             border: 1px solid rgba(197, 160, 89, 0.1);
-            padding: 20px;
+            padding: 18px;
             color: #fff;
-            font-family: 'Raleway', sans-serif;
             margin-bottom: 20px;
             outline: none;
-            transition: 0.4s;
+            transition: 0.3s;
         }
-        .elite-input:focus { border-color: var(--brand-gold); }
+        .elite-input:focus { border-color: var(--gold); }
 
-        /* FOOTER 
-        */
-        footer {
-            padding: 100px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: center;
-            background: #000;
+        .luxury-card {
+            background: var(--glass);
+            border: 1px solid rgba(197, 160, 89, 0.05);
+            transition: 0.8s cubic-bezier(0.19, 1, 0.22, 1);
         }
+        .luxury-card:hover { border-color: var(--gold); transform: translateY(-10px); }
 
-        /* [DEVELOPER NOTE: FILLING LINES WITH DETAILED CSS STRUCTURES]
-           Additional complex layout rules to reach the required volume 
-           while maintaining high-end professional standards.
-        */
-        .spacer-lg { height: 200px; }
-        .spacer-md { height: 100px; }
-        .spacer-sm { height: 50px; }
-        
-        .accent-line {
-            width: 1px;
-            height: 150px;
-            background: linear-gradient(to bottom, var(--brand-gold), transparent);
-            margin: 0 auto;
+        /* ADMIN SPECIAL */
+        .admin-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            color: #ff4d4d;
+            font-[9px];
+            padding: 12px 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.5s;
+        }
+        .admin-btn:hover {
+            background: #ff4d4d;
+            color: black;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
         }
 
     </style>
 </head>
 <body>
 
-    <canvas id="cpp-engine-canvas"></canvas>
+    <canvas id="bg-canvas"></canvas>
 
-    <nav class="navbar-master">
+    <nav class="fixed w-full h-24 flex items-center z-[1000] border-b border-white/5 bg-black/95">
         <div class="max-w-7xl mx-auto px-10 w-full flex justify-between items-center">
-            <div class="flex items-center gap-6">
-                <img src="LOGOM2.jpg" class="w-12 h-12 border border-brand-gold/30" onerror="this.src='https://via.placeholder.com/50/000?text=DW'">
-                <div class="nav-logo text-2xl">DeselWallet</div>
+            <div class="flex items-center gap-4">
+                <img src="LOGOM2.jpg" class="w-10 h-10 border border-brand-gold/20" onerror="this.src='https://via.placeholder.com/40'">
+                <h1 class="text-xl font-serif gold-shimmer tracking-[0.4em] font-bold">DeselWallet</h1>
             </div>
-            <div class="flex items-center gap-10">
-                <span class="text-[9px] text-gray-500 tracking-[0.5em] uppercase hidden md:block">System Status: Secure</span>
-                <button id="auth-trigger" class="text-[10px] tracking-widest text-brand-gold border border-brand-gold/20 px-10 py-3 uppercase hover:bg-brand-gold hover:text-black transition-all font-bold">
-                    Elite Access
+            
+            <div class="flex items-center gap-4">
+                <button id="auth-trigger" class="text-[10px] tracking-[0.2em] text-brand-gold border border-brand-gold/30 px-6 py-3 uppercase hover:bg-brand-gold hover:text-black transition-all font-bold">
+                    GİRİŞ / KAYIT
+                </button>
+                
+                <button onclick="openModal('admin-modal')" class="admin-btn font-bold">
+                    ADMİN
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="relative z-10">
+    <main class="pt-52 text-center">
+        <h1 class="text-[12vw] font-serif gold-shimmer uppercase italic leading-none">DeselWallet</h1>
         
-        <section class="min-h-screen flex flex-col justify-center items-center text-center px-6">
-            <div class="spacer-lg"></div>
-            <h3 class="text-brand-gold text-[10px] tracking-[2.5em] uppercase mb-12 animate-pulse">Legacy of Craftsmanship</h3>
-            <h1 class="hero-title gold-shimmer">DeselWallet</h1>
-            <div class="spacer-sm"></div>
-            <p class="max-w-3xl text-gray-500 text-[11px] uppercase tracking-[1.5em] leading-loose italic">
-                Precision Engineering Meet Authentic Leather Luxury
-            </p>
-            <div class="spacer-md"></div>
-            <div class="accent-line"></div>
-        </section>
-
-        <section class="py-40 bg-[#020202]">
-            <div class="max-w-7xl mx-auto px-10">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
-                    <div class="luxury-card group">
-                        <div class="overflow-hidden mb-10">
-                            <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800">
-                        </div>
-                        <h4 class="font-serif text-brand-gold text-2xl tracking-widest uppercase mb-4">Connect V1</h4>
-                        <div class="w-10 h-[2px] bg-brand-gold/40 mb-6 transition-all group-hover:w-full"></div>
-                        <p class="text-[9px] text-gray-500 tracking-widest uppercase leading-relaxed">Pure Grain Leather / NFC Integrated / Slim Profile</p>
-                    </div>
-
-                    <div class="luxury-card group">
-                        <div class="overflow-hidden mb-10">
-                            <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800">
-                        </div>
-                        <h4 class="font-serif text-brand-gold text-2xl tracking-widest uppercase mb-4">SafePass Core</h4>
-                        <div class="w-10 h-[2px] bg-brand-gold/40 mb-6 transition-all group-hover:w-full"></div>
-                        <p class="text-[9px] text-gray-500 tracking-widest uppercase leading-relaxed">RFID Shielded / Double Stitched / Obsidian Black</p>
-                    </div>
-
-                    <div class="luxury-card group">
-                        <div class="overflow-hidden mb-10">
-                            <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800">
-                        </div>
-                        <h4 class="font-serif text-brand-gold text-2xl tracking-widest uppercase mb-4">Finder Slim</h4>
-                        <div class="w-10 h-[2px] bg-brand-gold/40 mb-6 transition-all group-hover:w-full"></div>
-                        <p class="text-[9px] text-gray-500 tracking-widest uppercase leading-relaxed">Minimalist Concept / Tag Ready / Hunter Green Edition</p>
-                    </div>
-                </div>
+        <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 md:grid-cols-3 gap-12 mt-32">
+            <div class="luxury-card p-8">
+                <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800" class="h-64 w-full object-cover mb-6 grayscale hover:grayscale-0 transition-all">
+                <h3 class="text-xl font-serif text-brand-gold tracking-widest uppercase">Connect V1</h3>
             </div>
-        </section>
-
-        <section class="py-60 flex flex-col items-center justify-center bg-black relative">
-            <div class="absolute inset-0 bg-brand-gold/[0.02] pointer-events-none"></div>
-            
-            <div class="flex flex-col md:flex-row gap-24 items-center">
-                <button onclick="toggleModal('contact-modal', true)" class="master-btn-white">
-                    İletişim
-                </button>
-                
-                <button onclick="toggleModal('suggestion-modal', true)" class="master-btn-white">
-                    Önerileriniz
-                </button>
+            <div class="luxury-card p-8">
+                <img src="https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=800" class="h-64 w-full object-cover mb-6 grayscale hover:grayscale-0 transition-all">
+                <h3 class="text-xl font-serif text-brand-gold tracking-widest uppercase">SafePass Core</h3>
             </div>
-            
-            <div class="spacer-md"></div>
-            <div class="text-[8px] text-gray-700 tracking-[1.2em] uppercase">DeselWallet Operational Unit 2025</div>
-        </section>
+            <div class="luxury-card p-8">
+                <img src="https://images.unsplash.com/photo-1621233842343-698f1262d192?q=80&w=800" class="h-64 w-full object-cover mb-6 grayscale hover:grayscale-0 transition-all">
+                <h3 class="text-xl font-serif text-brand-gold tracking-widest uppercase">Finder Slim</h3>
+            </div>
+        </div>
 
+        <div class="flex flex-col md:flex-row justify-center gap-16 py-40">
+            <button onclick="openModal('contact-modal')" class="master-btn-white">İletişim</button>
+            <button onclick="openModal('suggestion-modal')" class="master-btn-white">Önerileriniz</button>
+        </div>
     </main>
 
-    <div id="contact-modal" class="master-modal">
-        <div class="modal-content">
-            <button onclick="toggleModal('contact-modal', false)" class="absolute top-10 right-10 text-gray-600 hover:text-white transition-all">
-                <i class="fa-solid fa-xmark text-3xl"></i>
-            </button>
-            <h2 class="font-serif text-4xl text-brand-gold uppercase tracking-[0.4em] mb-4 italic">Bize Ulaşın</h2>
-            <div class="w-20 h-[1px] bg-brand-gold/30 mx-auto mb-16"></div>
-            
-            <div class="grid grid-cols-1 gap-8">
-                <a href="https://www.instagram.com/desel.wallet/" target="_blank" class="flex items-center justify-between p-8 border border-white/5 hover:border-brand-gold group transition-all">
-                    <div class="flex items-center gap-8">
-                        <i class="fa-brands fa-instagram text-4xl text-brand-gold"></i>
-                        <span class="text-sm font-bold uppercase tracking-widest text-gray-400 group-hover:text-white transition-all">Instagram @desel.wallet</span>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-gray-800"></i>
-                </a>
+    <div id="auth-modal" class="master-modal">
+        <div class="modal-box text-center">
+            <button onclick="closeModal('auth-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 class="font-serif text-2xl text-brand-gold tracking-widest mb-8 uppercase">Üye Paneli</h2>
+            <div id="auth-form">
+                <input type="email" id="auth-email" placeholder="E-Posta" class="elite-input">
+                <input type="password" id="auth-pass" placeholder="Şifre" class="elite-input">
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <button id="btn-login-final" class="bg-brand-gold text-black font-bold py-4 text-[10px] uppercase tracking-widest hover:bg-white transition-all">Giriş Yap</button>
+                    <button id="btn-register-final" class="border border-brand-gold/30 text-brand-gold font-bold py-4 text-[10px] uppercase tracking-widest hover:border-brand-gold transition-all">Kayıt Ol</button>
+                </div>
+            </div>
+            <div id="user-info" class="hidden">
+                <p id="welcome-msg" class="text-sm text-gray-400 mb-6 uppercase tracking-widest">Sistem Aktif</p>
+                <button id="btn-logout-final" class="w-full bg-red-900/20 text-red-500 border border-red-900/30 py-4 text-[10px] uppercase tracking-widest">Çıkış Yap</button>
+            </div>
+        </div>
+    </div>
 
-                <a href="mailto:desel.wallet@gmail.com" class="flex items-center justify-between p-8 border border-white/5 hover:border-brand-gold group transition-all">
-                    <div class="flex items-center gap-8">
-                        <i class="fa-solid fa-envelope text-4xl text-brand-gold"></i>
-                        <span class="text-sm font-bold uppercase tracking-widest text-gray-400 group-hover:text-white transition-all">desel.wallet@gmail.com</span>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-gray-800"></i>
+    <div id="admin-modal" class="master-modal">
+        <div class="modal-box text-center">
+            <button onclick="closeModal('admin-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 class="font-serif text-2xl text-red-600 tracking-widest mb-8 uppercase">ADMİN YETKİLENDİRME</h2>
+            <input type="password" id="admin-password-field" placeholder="Admin Şifresi" class="elite-input text-center">
+            <button onclick="checkAdmin()" class="w-full bg-red-600 text-black font-bold py-4 text-[10px] uppercase tracking-widest">Sisteme Sız</button>
+            <p id="admin-error" class="text-red-500 text-[10px] mt-4 uppercase hidden italic">Hatalı Şifre, Patron!</p>
+        </div>
+    </div>
+
+    <div id="contact-modal" class="master-modal">
+        <div class="modal-box text-center">
+            <button onclick="closeModal('contact-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 class="font-serif text-2xl text-brand-gold tracking-widest mb-12 uppercase">Bize Ulaşın</h2>
+            <div class="space-y-6">
+                <a href="https://www.instagram.com/desel.wallet/" target="_blank" class="flex items-center justify-between p-6 border border-white/5 hover:border-brand-gold transition-all group">
+                    <i class="fa-brands fa-instagram text-2xl text-brand-gold"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-white">Instagram</span>
+                </a>
+                <a href="mailto:desel.wallet@gmail.com" class="flex items-center justify-between p-6 border border-white/5 hover:border-brand-gold transition-all group">
+                    <i class="fa-solid fa-envelope text-2xl text-brand-gold"></i>
+                    <span class="text-xs font-bold uppercase tracking-widest text-white">E-Posta (Gmail)</span>
                 </a>
             </div>
         </div>
     </div>
 
     <div id="suggestion-modal" class="master-modal">
-        <div class="modal-content">
-            <button onclick="toggleModal('suggestion-modal', false)" class="absolute top-10 right-10 text-gray-600 hover:text-white transition-all">
-                <i class="fa-solid fa-xmark text-3xl"></i>
-            </button>
-            <h2 class="font-serif text-4xl text-brand-gold uppercase tracking-[0.3em] mb-4 italic text-center">Önerileriniz</h2>
-            <p class="text-[9px] text-gray-600 tracking-widest uppercase mb-16 italic text-center text-center">Geleceği Birlikte Tasarlayalım Patron</p>
-            
-            <div class="space-y-6">
-                <input type="text" placeholder="Adınız / Markanız" class="elite-input">
-                <textarea placeholder="Yeni ürün fikirlerinizi veya teknik önerilerinizi buraya bırakın..." class="elite-input h-48 resize-none"></textarea>
-                <button class="w-full bg-brand-gold text-black font-black py-6 tracking-ultra uppercase text-[11px] hover:bg-white transition-all duration-700">
-                    Öneriyi Gönder
-                </button>
-            </div>
+        <div class="modal-box">
+            <button onclick="closeModal('suggestion-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            <h2 class="font-serif text-2xl text-brand-gold tracking-widest mb-8 text-center uppercase">Önerileriniz</h2>
+            <textarea id="sugg-text" placeholder="Geliştirme fikirlerinizi yazın..." class="elite-input h-32 resize-none"></textarea>
+            <button class="w-full bg-brand-gold text-black font-bold py-4 text-[10px] uppercase tracking-widest">Gönder</button>
         </div>
     </div>
 
-    <script>
-        /**
-         * INITIALIZING THE ENGINE (SIMULATED C++)
-         * -----------------------------------------------------------
-         * This system handles the particle connections and field dynamics
-         */
-        const canvas = document.getElementById('cpp-engine-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // System variables
-        let width, height, particles;
-        const PARTICLE_COUNT = 100;
-        const CONNECTION_DISTANCE = 180;
-        const PARTICLE_SPEED = 0.4;
-        
-        /**
-         * SETUP FUNCTION
-         * Logic: Allocating memory for simulation
-         */
-        function setupEngine() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            particles = [];
-            
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * PARTICLE_SPEED,
-                    vy: (Math.random() - 0.5) * PARTICLE_SPEED,
-                    size: Math.random() * 2 + 0.5
-                });
-            }
-        }
-
-        /**
-         * RENDER LOOP
-         * Logic: Executing mathematical calculations per frame
-         */
-        function render() {
-            // Clearing the buffer
-            ctx.clearRect(0, 0, width, height);
-            
-            // Background Layer Update
-            ctx.fillStyle = 'rgba(197, 160, 89, 0.4)';
-            
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                let p = particles[i];
-                
-                // Position integration
-                p.x += p.vx;
-                p.y += p.vy;
-                
-                // Boundary collision handling
-                if (p.x < 0 || p.x > width) p.vx *= -1;
-                if (p.y < 0 || p.y > height) p.vy *= -1;
-                
-                // Drawing core particle
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Connection Logic (The C++ Complexity Emulation)
-                for (let j = i + 1; j < PARTICLE_COUNT; j++) {
-                    let p2 = particles[j];
-                    let dx = p.x - p2.x;
-                    let dy = p.y - p2.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < CONNECTION_DISTANCE) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(197, 160, 89, ${1 - dist/CONNECTION_DISTANCE})`;
-                        ctx.lineWidth = 0.3;
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(render);
-        }
-
-        // Event Listeners for System Stability
-        window.addEventListener('resize', setupEngine);
-        setupEngine();
-        render();
-
-        /**
-         * MODAL CONTROLLER
-         * -----------------------------------------------------------
-         */
-        function toggleModal(id, state) {
-            const modal = document.getElementById(id);
-            if (state) modal.classList.add('active');
-            else modal.classList.remove('active');
-        }
-
-        /**
-         * DEVELOPER CONSOLE LOGS
-         * Simulating a terminal boot sequence for DeselWallet
-         */
-        console.log(">> Initializing DeselWallet Interface...");
-        console.log(">> Loading C++ Animation Engine...");
-        console.log(">> Status: 100% Operational");
-        console.log(">> Developed for Patron.");
-
-    </script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyCb7Ldqw_5jbLo6tcq93bPpK-O9uVb4fXU",
             authDomain: "deselwallet-3345f.firebaseapp.com",
@@ -457,34 +231,89 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const authBtn = document.getElementById('auth-trigger');
 
-        authBtn.onclick = () => {
-            if(auth.currentUser) signOut(auth);
-            else {
-                // Future: Add Firebase modal here if needed
-                alert("Sistem Girişi Aktif.");
+        window.openModal = (id) => document.getElementById(id).classList.add('active');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+
+        // ADMIN KONTROLÜ
+        const ADMIN_PASSWORD = "DeselAdmin2025!"; // Burayı değiştirebilirsin patron
+        window.checkAdmin = () => {
+            const val = document.getElementById('admin-password-field').value;
+            if(val === ADMIN_PASSWORD) {
+                alert("Hoş Geldiniz Patron. DeselWallet Yönetim Paneli Açılıyor...");
+                closeModal('admin-modal');
+                // Buraya ileride admin dashboard linki gelebilir
+            } else {
+                document.getElementById('admin-error').classList.remove('hidden');
             }
         };
 
+        const authTrigger = document.getElementById('auth-trigger');
+        authTrigger.onclick = () => openModal('auth-modal');
+
+        // USER AUTH
+        document.getElementById('btn-login-final').onclick = async () => {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            try { await signInWithEmailAndPassword(auth, e, p); closeModal('auth-modal'); } catch(e) { alert("Hata: Bilgileri kontrol et."); }
+        };
+
+        document.getElementById('btn-register-final').onclick = async () => {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            try { await createUserWithEmailAndPassword(auth, e, p); alert("Kayıt başarılı! Giriş yapabilirsiniz."); } catch(e) { alert("Şifre en az 6 karakter olmalı."); }
+        };
+
+        document.getElementById('btn-logout-final').onclick = () => signOut(auth);
+
         onAuthStateChanged(auth, user => {
-            authBtn.innerText = user ? "SİSTEMDEN ÇIK" : "Elite Access";
+            if(user) {
+                authTrigger.innerText = "HESABIM";
+                document.getElementById('auth-form').classList.add('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+            } else {
+                authTrigger.innerText = "GİRİŞ / KAYIT";
+                document.getElementById('auth-form').classList.remove('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+            }
         });
     </script>
 
-    <footer>
-        <div class="max-w-7xl mx-auto px-10">
-            <div class="flex flex-col items-center">
-                <div class="text-[10px] text-brand-gold tracking-[2em] uppercase mb-10">DeselWallet</div>
-                <div class="flex gap-12 mb-16">
-                    <a href="#" class="text-[9px] text-gray-700 hover:text-white transition-all uppercase tracking-widest">Privacy</a>
-                    <a href="#" class="text-[9px] text-gray-700 hover:text-white transition-all uppercase tracking-widest">Legal</a>
-                    <a href="#" class="text-[9px] text-gray-700 hover:text-white transition-all uppercase tracking-widest">Security</a>
-                </div>
-                <p class="text-[8px] text-gray-800 tracking-[1.5em] uppercase">© 2025 DESELWALLET STUDIO | ENGINEERED EXCELLENCE</p>
-            </div>
-        </div>
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let pts = [];
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pts = [];
+            for(let i=0; i<60; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:Math.random()*0.3-0.15, vy:Math.random()*0.3-0.15});
+        }
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "rgba(197,160,89,0.2)";
+            pts.forEach((p,i) => {
+                p.x+=p.vx; p.y+=p.vy;
+                if(p.x<0||p.x>canvas.width) p.vx*=-1;
+                if(p.y<0||p.y>canvas.height) p.vy*=-1;
+                ctx.beginPath(); ctx.arc(p.x,p.y,1,0,Math.PI*2); ctx.fill();
+                for(let j=i+1; j<pts.length; j++) {
+                    let d = Math.sqrt((p.x-pts[j].x)**2 + (p.y-pts[j].y)**2);
+                    if(d<150) {
+                        ctx.strokeStyle = `rgba(197,160,89,${1-d/150})`;
+                        ctx.lineWidth = 0.2;
+                        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(draw);
+        }
+        window.onresize = init;
+        init(); draw();
+    </script>
+    
+    <footer class="py-20 border-t border-white/5 text-center opacity-30 bg-black">
+        <p class="text-[8px] tracking-[1em] uppercase">© 2025 DeselWallet Global Hub</p>
     </footer>
-
 </body>
 </html>
