@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeselWallet | Master Final Edition v8.0</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Raleway:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Raleway', 'sans-serif'], 
+                        serif: ['Cinzel', 'serif'] 
+                    },
+                    colors: { 
+                        brand: { 
+                            gold: '#C5A059', 
+                            goldDark: '#A68545',
+                            dark: '#050505', 
+                            card: '#0a0a0a',
+                            panel: '#080808'
+                        } 
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* BASE ARCHITECTURE */
+        body { 
+            background-color: #050505; 
+            color: #d1d1d1; 
+            scroll-behavior: smooth; 
+            overflow-x: hidden;
+            min-height: 100vh;
+            selection-background-color: #C5A059;
+            selection-color: #000;
+        }
+
+        .gold-shimmer { 
+            background: linear-gradient(90deg, #8A6E2F, #C5A059, #F2D091, #C5A059, #8A6E2F);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s linear infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+
+        /* CARD SYSTEM */
+        .luxury-card { 
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); 
+            border: 1px solid rgba(197, 160, 89, 0.05); 
+            background: #090909; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .luxury-card:hover { 
+            border-color: rgba(197, 160, 89, 0.4); 
+            transform: translateY(-12px); 
+            box-shadow: 0 40px 100px rgba(0,0,0,1);
+        }
+
+        .img-wrapper {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(1.1);
+            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .luxury-card:hover img {
+            filter: grayscale(0%) contrast(1);
+            transform: scale(1.08);
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            opacity: 0.6;
+            transition: opacity 0.5s;
+        }
+
+        .luxury-card:hover .card-overlay { opacity: 0.2; }
+
+        /* INPUTS & INTERFACE */
+        .elite-input { 
+            background: #030303; 
+            border: 1px solid rgba(197, 160, 89, 0.15); 
+            transition: all 0.4s ease; 
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .elite-input:focus { 
+            border-color: #C5A059; 
+            outline: none; 
+            background: rgba(197, 160, 89, 0.03);
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.05);
+        }
+
+        /* MODAL ENGINE */
+        .master-modal { 
+            display: none; 
+            opacity: 0; 
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
+            backdrop-filter: blur(35px); 
+            z-index: 99999; 
+            background: rgba(0,0,0,0.96);
+            position: fixed;
+            inset: 0;
+        }
+
+        .master-modal.active { 
+            display: flex; 
+            opacity: 1; 
+        }
+        
+        .modal-inner { 
+            transform: translateY(40px); 
+            transition: all 0.7s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        }
+
+        .active .modal-inner { 
+            transform: translateY(0); 
+        }
+
+        /* ADMIN CONSOLE UI */
+        .console-tab { 
+            color: #555; 
+            transition: all 0.4s; 
+            border-right: 3px solid transparent; 
+            padding: 18px 30px; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+            text-align: right;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .console-tab.active { 
+            color: #C5A059; 
+            border-right-color: #C5A059; 
+            background: linear-gradient(to right, transparent, rgba(197, 160, 89, 0.05));
+        }
+
+        .log-entry {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: 0.3s;
+        }
+
+        .log-entry:hover {
+            border-color: rgba(197, 160, 89, 0.2);
+            background: rgba(197, 160, 89, 0.02);
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 10px; }
+
+        .logo-guardian { 
+            width: 65px; 
+            height: 65px; 
+            border: 1px solid rgba(197, 160, 89, 0.3); 
+            padding: 5px;
+            background: #000;
+        }
+    </style>
+</head>
+<body id="master-body" class="antialiased flex flex-col">
+
+    <nav class="fixed w-full z-[9999] bg-black/95 border-b border-white/5 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-12 h-24 flex justify-between items-center">
+            
+            <div class="flex items-center gap-8 cursor-pointer group" id="home-trigger">
+                <div class="logo-guardian transition-transform duration-700 group-hover:rotate-[360deg]">
+                    <img src="LOGOM2.jpg" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/65/000?text=DW'">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-3xl font-serif text-brand-gold font-bold tracking-[0.25em] uppercase leading-none">DeselWallet</span>
+                    <span class="text-[0.6rem] text-gray-600 uppercase tracking-[0.6em] mt-2 font-bold italic">Established 2025</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-12">
+                <button id="auth-main-btn" class="text-[10px] uppercase tracking-[0.45em] text-brand-gold border border-brand-gold/30 px-10 py-4 hover:bg-brand-gold hover:text-black transition-all duration-500 font-bold shadow-lg shadow-brand-gold/5">
+                    Giriş Kapısı
+                </button>
+                <button id="admin-main-btn" class="text-gray-700 hover:text-brand-gold transition-all duration-500 scale-125">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="auth-modal" class="master-modal items-center justify-center p-8">
+        <div class="modal-inner bg-brand-card border border-brand-gold/20 w-full max-w-lg p-20 relative shadow-2xl">
+            <button id="auth-close-x" class="absolute top-10 right-10 text-gray-600 hover:text-brand-gold text-2xl transition-all">
+                <i class="fa-solid fa-times"></i>
+            </button>
+            
+            <div class="text-center">
+                <div class="mb-12">
+                    <i class="fa-solid fa-shield-halved text-5xl text-brand-gold opacity-20 animate-pulse-slow"></i>
+                </div>
+                <h3 class="text-white font-serif text-4xl gold-shimmer uppercase mb-14 tracking-[0.15em]">Kimlik Doğrulama</h3>
+                
+                <div class="space-y-8">
+                    <div class="text-left">
+                        <label class="text-[9px] uppercase tracking-widest text-gray-500 ml-1 mb-2 block">E-Posta</label>
+                        <input type="email" id="email-box" placeholder="admin@deselwallet.com" class="w-full elite-input p-5">
+                    </div>
+                    <div class="text-left">
+                        <label class="text-[9px] uppercase tracking-widest text-gray-500 ml-1 mb-2 block">Şifre</label>
+                        <input type="password" id="pass-box" placeholder="••••••••" class="w-full elite-input p-5">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 pt-8">
+                        <button id="btn-login" class="bg-brand-gold text-black font-bold py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-white transition-all shadow-xl">Oturum Aç</button>
+                        <button id="btn-register" class="border border-brand-gold/30 text-brand-gold font-bold py-5 text-[11px] uppercase tracking-[0.3em] hover:border-brand-gold transition-all">Kayıt Ol</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="master-modal items-center justify-center p-4">
+        <div class="modal-inner bg-brand-card border border-brand-gold/15 w-full max-w-7xl h-[85vh] flex relative overflow-hidden rounded-sm">
+            <button id="admin-close-x" class="absolute top-10 right-12 text-gray-500 hover:text-white z-50 text-3xl"><i class="fa-solid fa-circle-chevron-down"></i></button>
+            
+            <div class="w-80 border-r border-white/5 bg-black/40 p-16 hidden lg:flex flex-col justify-between">
+                <div class="space-y-20">
+                    <h2 class="font-serif text-brand-gold text-2xl uppercase tracking-widest border-b border-brand-gold/10 pb-6">Master Control</h2>
+                    <nav class="flex flex-col gap-2">
+                        <button id="tab-log" class="console-tab active">Sistem Günlüğü</button>
+                        <button id="tab-ban" class="console-tab">Erişim Engeli</button>
+                        <button id="tab-msg" class="console-tab">Müşteri Talepleri</button>
+                    </nav>
+                </div>
+                <div class="text-[8px] text-gray-600 uppercase tracking-[0.4em] leading-loose italic">
+                    Encrypted Connection: AES-256<br>
+                    Kernel: DeselOS v8.2.1
+                </div>
+            </div>
+
+            <div class="flex-grow p-12 lg:p-24 overflow-y-auto bg-[#040404]">
+                <div id="admin-lock-panel" class="max-w-md mx-auto py-24 text-center">
+                    <h3 class="text-white font-serif text-5xl mb-14 gold-shimmer uppercase tracking-tighter italic">Authority</h3>
+                    <input type="password" id="admin-passkey" placeholder="ANAHTAR KOD" class="w-full bg-transparent border-b border-brand-gold/30 p-6 text-center text-white text-3xl tracking-[1.2em] mb-16 outline-none focus:border-brand-gold transition-all">
+                    <button id="admin-auth-btn" class="w-full bg-brand-gold text-black font-bold py-6 uppercase text-[12px] tracking-[0.6em] hover:bg-white transition-all shadow-2xl">Sisteme Bağlan</button>
+                </div>
+                
+                <div id="admin-main-ui" class="hidden space-y-16 animate-in fade-in duration-1000">
+                    <div id="sec-log" class="space-y-10">
+                        <h3 class="text-white font-serif text-3xl uppercase tracking-widest flex items-center gap-6"><span class="w-12 h-[1px] bg-brand-gold"></span>Canlı Trafik</h3>
+                        <div id="render-logs" class="space-y-3"></div>
+                    </div>
+                    <div id="sec-ban" class="hidden space-y-10">
+                        <h3 class="text-red-900 font-serif text-3xl uppercase tracking-widest flex items-center gap-6"><span class="w-12 h-[1px] bg-red-900"></span>Yasaklılar Listesi</h3>
+                        <div id="render-bans" class="space-y-3"></div>
+                    </div>
+                    <div id="sec-msg" class="hidden space-y-10">
+                        <h3 class="text-blue-900 font-serif text-3xl uppercase tracking-widest flex items-center gap-6"><span class="w-12 h-[1px] bg-blue-900"></span>Gelen Kutusu</h3>
+                        <div id="render-msgs" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main id="view-port" class="flex-grow pt-24"></main>
+
+    <footer class="border-t border-white/5 py-24 bg-black text-center mt-auto">
+        <div class="max-w-7xl mx-auto px-12">
+            <div class="flex flex-col items-center gap-10">
+                <h4 class="font-serif text-brand-gold text-2xl tracking-[0.5em] uppercase opacity-40">Desel</h4>
+                <div class="flex gap-12 text-gray-700 text-sm">
+                    <a href="#" class="hover:text-brand-gold transition-colors tracking-widest uppercase text-[9px]">Koleksiyonlar</a>
+                    <a href="#" class="hover:text-brand-gold transition-colors tracking-widest uppercase text-[9px]">Atölye</a>
+                    <a href="#" class="hover:text-brand-gold transition-colors tracking-widest uppercase text-[9px]">Hakkımızda</a>
+                </div>
+                <p class="text-[8px] text-gray-800 uppercase tracking-[1em] mt-10">© 2025 All Rights Reserved. Designed by Patron.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, deleteDoc, serverTimestamp, query, orderBy, limit, onSnapshot, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 1. CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyCb7Ldqw_5jbLo6tcq93bPpK-O9uVb4fXU",
+            authDomain: "deselwallet-3345f.firebaseapp.com",
+            projectId: "deselwallet-3345f",
+            appId: "1:408489830274:web:2fa8ff3d989e23efb1519b",
+            measurementId: "G-RZBZG3NB1Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Database Paths
+        const C_LOGS = 'artifacts/deselwallet-prod/public/data/access_logs';
+        const C_BANS = 'artifacts/deselwallet-prod/public/data/blacklist';
+        const C_SUGS = 'artifacts/deselwallet-prod/public/data/suggestions';
+
+        // 2. WINDOW ACTIONS (UI Callables)
+        window.masterSuggest = async () => {
+            const area = document.getElementById('sug-area');
+            const val = area.value.trim();
+            if(!val) return alert("Boş mesaj kabul edilmez patron.");
+            if(!auth.currentUser) return alert("Lütfen önce sisteme giriş yapın.");
+
+            try {
+                await addDoc(collection(db, C_SUGS), { 
+                    user: auth.currentUser.email, 
+                    target: "desel.wallet@gmail.com", 
+                    text: val, 
+                    ts: serverTimestamp() 
+                });
+                alert("Mesajınız desel.wallet@gmail.com veri merkezine başarıyla iletildi.");
+                area.value = "";
+            } catch(e) { alert("Bağlantı Hatası: Mesaj iletilemedi."); }
+        };
+
+        window.adminBan = async (uid, mail) => {
+            if(confirm(mail + " erişimi kalıcı olarak engellensin mi?")) {
+                await addDoc(collection(db, C_BANS), { uid, mail, ts: serverTimestamp() });
+            }
+        };
+
+        window.adminUnban = async (id) => {
+            if(confirm("Engel kaldırılıyor, emin misiniz?")) {
+                await deleteDoc(doc(db, C_BANS, id));
+            }
+        };
+
+        // 3. EVENT HANDLERS
+        const authM = document.getElementById('auth-modal');
+        const adminM = document.getElementById('admin-modal');
+
+        document.getElementById('auth-main-btn').onclick = () => {
+            if(auth.currentUser) signOut(auth);
+            else authM.classList.add('active');
+        };
+
+        document.getElementById('admin-main-btn').onclick = () => adminM.classList.add('active');
+        document.getElementById('auth-close-x').onclick = () => authM.classList.remove('active');
+        document.getElementById('admin-close-x').onclick = () => adminM.classList.remove('active');
+
+        // REGISTER LOGIC (FIXED)
+        document.getElementById('btn-register').onclick = async () => {
+            const e = document.getElementById('email-box').value;
+            const p = document.getElementById('pass-box').value;
+            if(p.length < 6) return alert("Güvenlik protokolü: Şifre en az 6 karakter olmalıdır.");
+            
+            try { 
+                await createUserWithEmailAndPassword(auth, e, p); 
+                authM.classList.remove('active'); 
+            } catch(err) { 
+                if(err.code === 'auth/email-already-in-use') {
+                    alert("Bu e-posta zaten kayıtlı patron! Lütfen 'Oturum Aç' butonunu kullanın.");
+                } else {
+                    alert("Kayıt Hatası: " + err.message);
+                }
+            }
+        };
+
+        // LOGIN LOGIC
+        document.getElementById('btn-login').onclick = async () => {
+            const e = document.getElementById('email-box').value;
+            const p = document.getElementById('pass-box').value;
+            try { 
+                await signInWithEmailAndPassword(auth, e, p); 
+                authM.classList.remove('active'); 
+            } catch(err) { alert("Erişim Reddedildi: Bilgilerinizi kontrol edin."); }
+        };
+
+        // ADMIN UNLOCK
+        document.getElementById('admin-auth-btn').onclick = () => {
+            if(document.getElementById('admin-passkey').value === "DeselAdmin2025!") {
+                document.getElementById('admin-lock-panel').classList.add('hidden');
+                document.getElementById('admin-main-ui').classList.remove('hidden');
+                runAdminEngine();
+            } else alert("YETKİSİZ ERİŞİM DENEMESİ LOGLANDI!");
+        };
+
+        // 4. ADMIN CONSOLE ENGINE
+        function runAdminEngine() {
+            // Live Logs Observer
+            onSnapshot(query(collection(db, C_LOGS), orderBy("ts", "desc"), limit(30)), snap => {
+                const box = document.getElementById('render-logs'); box.innerHTML = "";
+                snap.forEach(d => {
+                    const data = d.data();
+                    box.innerHTML += `
+                        <div class="log-entry p-5 flex justify-between items-center text-[10px]">
+                            <div class="flex gap-8 items-center">
+                                <span class="text-brand-gold font-mono opacity-50">${data.ts?.toDate().toLocaleTimeString() || 'SİNC'}</span>
+                                <span class="text-white font-bold tracking-[0.2em] uppercase">${data.user}</span>
+                            </div>
+                            <button onclick="adminBan('${data.uid}', '${data.user}')" class="text-red-800 border border-red-900/20 px-5 py-2 hover:bg-red-900 hover:text-white transition-all font-bold uppercase tracking-widest">Yasakla</button>
+                        </div>`;
+                });
+            });
+
+            // Blacklist Observer
+            onSnapshot(collection(db, C_BANS), snap => {
+                const box = document.getElementById('render-bans'); box.innerHTML = "";
+                snap.forEach(d => {
+                    box.innerHTML += `
+                        <div class="log-entry p-5 flex justify-between items-center text-[10px] border-red-900/10">
+                            <span class="text-red-700 font-bold uppercase tracking-[0.3em]">${d.data().mail}</span>
+                            <button onclick="adminUnban('${d.id}')" class="text-green-800 border border-green-900/20 px-5 py-2 hover:bg-green-900 hover:text-white transition-all font-bold uppercase">Affet</button>
+                        </div>`;
+                });
+            });
+
+            // Messages Observer
+            onSnapshot(query(collection(db, C_SUGS), orderBy("ts", "desc")), snap => {
+                const box = document.getElementById('render-msgs'); box.innerHTML = "";
+                snap.forEach(d => {
+                    const data = d.data();
+                    box.innerHTML += `
+                        <div class="log-entry p-10 bg-blue-950/5 border-blue-900/10">
+                            <div class="flex justify-between mb-5 text-[9px] text-blue-500 font-bold uppercase tracking-widest">
+                                <span>Gönderen: ${data.user}</span>
+                                <span>Hedef: desel.wallet@gmail.com</span>
+                            </div>
+                            <p class="text-white text-sm leading-relaxed italic opacity-90">"${data.text}"</p>
+                        </div>`;
+                });
+            });
+        }
+
+        // Tab Switching Logic
+        const setAdminView = (idx) => {
+            const tabs = ['log', 'ban', 'msg'];
+            tabs.forEach((t, i) => {
+                document.getElementById('sec-' + t).classList.toggle('hidden', i !== idx);
+                document.getElementById('tab-' + t).classList.toggle('active', i === idx);
+            });
+        };
+        document.getElementById('tab-log').onclick = () => setAdminView(0);
+        document.getElementById('tab-ban').onclick = () => setAdminView(1);
+        document.getElementById('tab-msg').onclick = () => setAdminView(2);
+
+        // 5. RENDER SYSTEM
+        const renderUI = () => {
+            document.getElementById('view-port').innerHTML = `
+                <div class="text-center pt-32 pb-32">
+                    <h1 class="text-8xl md:text-[13rem] font-serif text-white gold-shimmer italic tracking-tighter uppercase leading-[0.75]">DESEL</h1>
+                    <div class="flex items-center justify-center gap-6 mt-16 opacity-30">
+                        <div class="h-[1px] w-24 bg-brand-gold"></div>
+                        <p class="text-[11px] text-white uppercase tracking-[2.2em] font-medium ml-[2.2em]">Authentic Leather</p>
+                        <div class="h-[1px] w-24 bg-brand-gold"></div>
+                    </div>
+                </div>
+                
+                <div class="max-w-7xl mx-auto px-12 pb-56">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-20 items-start">
+                        
+                        <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-12">
+                            ${[
+                                {name:'Connect V1', img:'1627123424574-724758594e93', tag:'Original'},
+                                {name:'SafePass Pro', img:'1554188248-986adbb73be4', tag:'Security'},
+                                {name:'Finder X2', img:'1621233842343-698f1262d192', tag:'Compact'}
+                            ].map(item => `
+                                <div class="luxury-card p-7">
+                                    <div class="img-wrapper mb-10 shadow-2xl">
+                                        <div class="card-overlay"></div>
+                                        <img src="https://images.unsplash.com/photo-${item.img}?q=80&w=800">
+                                    </div>
+                                    <h3 class="text-white font-serif text-3xl uppercase tracking-widest mb-4">${item.name}</h3>
+                                    <div class="flex justify-between items-center border-t border-white/5 pt-6 mt-2">
+                                        <span class="text-brand-gold text-[10px] font-bold tracking-[0.4em] uppercase italic opacity-70">${item.tag}</span>
+                                        <i class="fa-solid fa-arrow-right-long text-gray-800"></i>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="lg:col-span-1 bg-brand-panel border border-brand-gold/10 p-14 shadow-2xl sticky top-40">
+                            <h2 class="text-white font-serif text-3xl gold-shimmer uppercase mb-10 tracking-tighter">İletişim</h2>
+                            <p class="text-gray-600 text-[10px] tracking-[0.25em] uppercase mb-12 leading-loose font-medium italic">
+                                Tüm görüşleriniz <br> <span class="text-brand-gold font-bold">desel.wallet@gmail.com</span> <br> veritabanına kaydedilir.
+                            </p>
+                            <textarea id="sug-area" placeholder="Bir not bırakın patron..." class="w-full h-72 elite-input p-6 mb-12 resize-none shadow-inner"></textarea>
+                            <button onclick="masterSuggest()" class="bg-brand-gold text-black w-full py-6 font-bold uppercase text-[11px] tracking-[0.4em] hover:bg-white transition-all shadow-2xl">Gönderiyi İlet</button>
+                        </div>
+
+                    </div>
+                </div>`;
+        };
+
+        // 6. SESSION OBSERVER
+        onAuthStateChanged(auth, async user => {
+            const b = document.getElementById('auth-main-btn');
+            if(user) {
+                // Check if Banned
+                const q = query(collection(db, C_BANS), where("uid", "==", user.uid));
+                const snap = await getDocs(q);
+                if(!snap.empty) {
+                    document.body.innerHTML = `
+                        <div class="h-screen bg-black flex flex-col items-center justify-center gap-12">
+                            <i class="fa-solid fa-lock text-red-900 text-7xl opacity-20"></i>
+                            <h1 class="text-red-900 text-4xl font-serif uppercase tracking-[1em] text-center ml-[1em]">Erişim Engellendi</h1>
+                            <p class="text-gray-700 text-[10px] uppercase tracking-[0.5em]">Yöneticiniz Tarafından Kısıtlandınız.</p>
+                        </div>`;
+                    return;
+                }
+                
+                b.innerText = "ÇIKIŞ (" + (user.email ? user.email.split('@')[0].toUpperCase() : "MASTER") + ")";
+                await addDoc(collection(db, C_LOGS), { user: user.email || "Anonim", uid: user.uid, ts: serverTimestamp() });
+                renderUI();
+            } else {
+                b.innerText = "Giriş Kapısı";
+                renderUI();
+            }
+        });
+    </script>
+</body>
+</html>
