@@ -9,9 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
     <style>
-        /* CSS AYNI KALDI - Modern Glassmorphism */
+        /* GENEL TASARIM */
         :root { --primary: #00ff88; --danger: #ff4d4d; --glass: rgba(255, 255, 255, 0.1); --text: #ffffff; }
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f2027, #2c5364); height: 100vh; color: var(--text); }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f2027, #2c5364); height: 100vh; color: var(--text); overflow-x: hidden; }
         
         .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; }
         .glass-box { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
@@ -31,6 +31,22 @@
         .panel-section { background: var(--glass); padding: 20px; border-radius: 15px; height: 400px; overflow-y: auto; }
         .user-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .btn-sm { width: auto; padding: 5px 10px; font-size: 12px; }
+
+        /* BİLDİRİM KUTUSU TASARIMI */
+        .notif-card {
+            position: fixed; bottom: 20px; right: 20px; width: 320px; padding: 20px; z-index: 10000;
+            display: none; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--glass); backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .notif-content { display: flex; align-items: center; margin-bottom: 15px; }
+        .notif-icon { font-size: 30px; margin-right: 15px; }
+        .notif-text h4 { margin: 0; color: var(--primary); }
+        .notif-text p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.8; }
+        .notif-buttons { display: flex; gap: 10px; }
+        .btn-allow { background: var(--primary) !important; color: #000 !important; }
+        .btn-close { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
     </style>
 </head>
 <body>
@@ -73,8 +89,22 @@
         </div>
     </div>
 
+    <div id="notification-box" class="notif-card">
+        <div class="notif-content">
+            <div class="notif-icon">🔔</div>
+            <div class="notif-text">
+                <h4>Yeniliklerden Haberdar Ol!</h4>
+                <p>Nexus AI güncellemelerini ve yeni özellikleri kaçırmamak için bildirimleri açın.</p>
+            </div>
+        </div>
+        <div class="notif-buttons">
+            <button onclick="closeNotif('allowed')" class="btn-allow">Bildirimleri Aç</button>
+            <button onclick="closeNotif('denied')" class="btn-close">Daha Sonra</button>
+        </div>
+    </div>
+
     <script>
-        // BURAYA KENDİ FİREBASE BİLGİLERİNİ YAPIŞTIR PATRON
+        // FIREBASE CONFIG - Patron burayı doldurmayı unutma
         const firebaseConfig = {
             apiKey: "AIzaSyCb7Ldqw_5jbLo6tcq93bPpK-O9uVb4fXU",
             authDomain: "deselwallet-3345f.firebaseapp.com",
@@ -85,38 +115,28 @@
             appId: "1:408489830274:web:2fa8ff3d989e23efb1519b"
         };
 
-        // Firebase Başlat
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
 
-        // GİRİŞ FONKSİYONU
         function login() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-
             auth.signInWithEmailAndPassword(email, pass)
                 .then(() => {
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('success-overlay').style.display = 'flex';
-                    
                     setTimeout(() => {
                         document.getElementById('success-overlay').style.display = 'none';
                         document.getElementById('admin-panel').style.display = 'block';
-                        loadData(); // Verileri Firebase'den çek
+                        loadData();
                     }, 2000);
                 })
                 .catch(err => alert("Hata: " + err.message));
         }
 
-        // VERİLERİ ÇEKME (Realtime)
         function loadData() {
-            // Ziyaretçi Sayısı
-            database.ref('stats/visitors').on('value', snap => {
-                document.getElementById('visitorCount').innerText = snap.val() || 0;
-            });
-
-            // Kullanıcıları Listele
+            database.ref('stats/visitors').on('value', snap => { document.getElementById('visitorCount').innerText = snap.val() || 0; });
             database.ref('users').on('value', snap => {
                 const list = document.getElementById('user-list');
                 list.innerHTML = "";
@@ -124,40 +144,43 @@
                 snap.forEach(user => {
                     count++;
                     const data = user.val();
-                    list.innerHTML += `
-                        <div class="user-item">
-                            <span>${data.username} (${data.isBlocked ? 'Engelli' : 'Aktif'})</span>
-                            <button class="btn-sm" style="background:${data.isBlocked ? '#00ff88' : '#ff4d4d'}" 
-                                onclick="toggleBlock('${user.key}', ${data.isBlocked})">
-                                ${data.isBlocked ? 'Engeli Kaldır' : 'Engelle'}
-                            </button>
-                        </div>`;
+                    list.innerHTML += `<div class="user-item">
+                        <span>${data.username} (${data.isBlocked ? 'Engelli' : 'Aktif'})</span>
+                        <button class="btn-sm" style="background:${data.isBlocked ? '#00ff88' : '#ff4d4d'}" onclick="toggleBlock('${user.key}', ${data.isBlocked})">${data.isBlocked ? 'Kaldır' : 'Engelle'}</button>
+                    </div>`;
                 });
                 document.getElementById('activeCount').innerText = count;
             });
-
-            // Önerileri Listele
             database.ref('suggestions').on('value', snap => {
                 const list = document.getElementById('suggestion-list');
                 list.innerHTML = "";
                 let sCount = 0;
-                snap.forEach(sug => {
-                    sCount++;
-                    const d = sug.val();
-                    list.innerHTML += `<div style="background:rgba(0,0,0,0.2); padding:10px; margin-bottom:5px; border-radius:10px;">
-                        <strong>${d.email}:</strong> <p>${d.text}</p>
-                    </div>`;
-                });
+                snap.forEach(sug => { sCount++; const d = sug.val(); list.innerHTML += `<div style="background:rgba(0,0,0,0.2); padding:10px; margin-bottom:5px; border-radius:10px;"><strong>${d.email}:</strong> <p>${d.text}</p></div>`; });
                 document.getElementById('sugCount').innerText = sCount;
             });
         }
 
-        // ENGELLE / ENGEL KALDIR
-        function toggleBlock(uid, currentStatus) {
-            database.ref('users/' + uid).update({ isBlocked: !currentStatus });
-        }
-
+        function toggleBlock(uid, currentStatus) { database.ref('users/' + uid).update({ isBlocked: !currentStatus }); }
         function logout() { auth.signOut(); location.reload(); }
+
+        // BİLDİRİM MANTIĞI
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (!localStorage.getItem('notif_preference')) {
+                    document.getElementById('notification-box').style.display = 'block';
+                }
+            }, 3000);
+        });
+
+        function closeNotif(status) {
+            localStorage.setItem('notif_preference', status);
+            const box = document.getElementById('notification-box');
+            box.style.transition = '0.5s';
+            box.style.transform = 'translateY(150px)';
+            box.style.opacity = '0';
+            setTimeout(() => { box.style.display = 'none'; }, 500);
+            if(status === 'allowed') alert("Bildirimler aktif edildi patron!");
+        }
     </script>
 </body>
 </html>
